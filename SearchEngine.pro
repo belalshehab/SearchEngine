@@ -27,7 +27,8 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
-    search_engine.h
+    search_engine.h \
+    trie.h
 
 FORMS += \
     mainwindow.ui

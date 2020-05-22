@@ -32,7 +32,6 @@ private slots:
 
     void on_filesListView_activated(const QModelIndex &index);
 
-//    void on_searchInput_editingFinished();
 
     void on_searchResultTreeView_activated(const QModelIndex &index);
 

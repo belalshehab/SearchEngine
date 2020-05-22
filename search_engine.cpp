@@ -5,7 +5,7 @@
 #include <QFile>
 #include <QDataStream>
 #include <QApplication>
-
+#include <QElapsedTimer>
 
 #include <iostream>
 #include <omp.h>
@@ -22,20 +22,27 @@ void SearchEngine::makeIndex(const QString &dirPath)
 {
     dir.setPath(dirPath);
 
-    if(dir.exists("index.indx"))
+    QElapsedTimer timer;
+    timer.start();
+
+    if(false)
+//    if(dir.exists("index.indx"))
     {
         QFile indexFile(dir.absoluteFilePath("index.indx"));
+
         indexFile.open(QIODevice::ReadOnly);
+
         QDataStream stream(&indexFile);
         stream.setVersion(QDataStream::Qt_5_12);
 
-        stream >> indexTable;
+//        stream >> indexTable;
+
+        qInfo() << "Read index took " << timer.elapsed() << "Ms";
     }
 
     else
     {
         QStringList listOfFilesNames = dir.entryList();
-
 
         int count = listOfFilesNames.count();
 
@@ -57,7 +64,7 @@ void SearchEngine::makeIndex(const QString &dirPath)
 
             if(i %100 == 0)
             {
-//                QApplication::processEvents();
+                QApplication::processEvents();
                 //                            qInfo() << " In file number " << i << " from total " << count << " " << (float(i) / count) *100 << "%";
                 emit progressChanged((float(i) / count) *100);
             }
@@ -65,12 +72,6 @@ void SearchEngine::makeIndex(const QString &dirPath)
             std::ifstream file(absoluteFileName.toStdString());
 
             std::string word;
-
-            //        QFile f(dirPath);
-            //        f.open(QIODevice::ReadOnly | QIODevice::Text);
-
-            //        QTextStream stream(&f);
-            //        QString QWord = QString::fromStdString(stdWord);
 
             while(file >> word)
             {
@@ -80,43 +81,22 @@ void SearchEngine::makeIndex(const QString &dirPath)
                 }
             }
         }
-
-        //    for(int i = 0; i < count; ++i)
-        //    {
-
-        //        QString fileName;
-        //        fileName = listOfFilesNames[i];
-
-        //        QString absoluteFileName{dir.absoluteFilePath(fileName)};
-
-        //        if(i %100 == 0)
-        //        {
-        //            qInfo() << omp_get_thread_num() << " In file number " << i << " from total " << count << " " << (float(i) / count) *100 << "%";
-        //        }
-
-        //        std::ifstream file(absoluteFileName.toStdString());
-
-        //        std::string stdWord;
-
-
-        //        while(file >> stdWord)
-        //        {
-        //            const QString QWord = QString::fromStdString(stdWord);
-        //            indexTable[QWord].insert(fileName);
-        //        }
-        //    }
-
         if(!stop)
         {
-            qInfo() << "saving the index table";
+            qInfo() << "indexing took " << timer.restart() /1000.0 << "Sec";
+//            qInfo() << "saving the index table";
 
-            QFile output(dir.absoluteFilePath("index.indx"));
-            QDataStream dataStream(&output);
-            dataStream.setVersion(QDataStream::Qt_5_12);
+//            QFile output(dir.absoluteFilePath("index.indx"));
 
-            output.open(QIODevice::WriteOnly);
+//            QDataStream dataStream(&output);
 
-            dataStream << indexTable;
+//            dataStream.setVersion(QDataStream::Qt_5_12);
+
+//            output.open(QIODevice::WriteOnly);
+
+//            dataStream << indexTable;
+
+//            qInfo() << "saving index took " << timer.restart() << "Ms";
         }
     }
 
@@ -131,9 +111,17 @@ void SearchEngine::makeIndex(const QString &dirPath)
 }
 
 
-QSet<QString> SearchEngine::search(const QString &word) const
+QVector<QString> SearchEngine::search(const QString &word) const
 {
-    return indexTable[word];
+    QVector<QString> vec;
+    auto x = indexTable[word].getData();
+    for(int i = 0; i < x.size(); ++i)
+    {
+        vec.push_back(x[i].first);
+    }
+
+    return vec;
+
 }
 
 void SearchEngine::abortIndexing()

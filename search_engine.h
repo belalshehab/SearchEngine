@@ -7,6 +7,8 @@
 #include <QDir>
 #include <QString>
 
+#include "trie.h"
+
 class SearchEngine : public QObject
 {
     Q_OBJECT
@@ -16,7 +18,7 @@ public:
 
     void makeIndex(const QString &dirPath);
 
-    QSet<QString> search(const QString &word) const;
+    QVector<QString> search(const QString &word) const;
 
 
 private:
@@ -29,7 +31,13 @@ public slots:
     void abortIndexing();
 
 private:
-    QMap<QString, QSet<QString> > indexTable;
+//    QMap<QString, QSet<QString> > indexTable;
+    //   word  files   fileName setOf line numbers
+//    QMap<QString, QMap<QString, QSet<int> > > indexTable;
+
+    Trie<Trie<QString> > indexTable;
+
+
     QDir dir;
     bool stop;
 };

@@ -39,13 +39,9 @@ void MainWindow::init()
 
     connect(&searchEngine, &SearchEngine::indexingFinished, this, &MainWindow::indexingFinished);
 
-    connect(&searchEngine, &SearchEngine::progressChanged, this, [](float value){
-        qInfo() << value;
-    });
-
-
-
-
+//    connect(&searchEngine, &SearchEngine::progressChanged, this, [](float value){
+//        qInfo() << value;
+//    });
 }
 
 
@@ -68,17 +64,6 @@ void MainWindow::on_filesListView_activated(const QModelIndex &index)
     ui->fileText->setText(file.readAll());
 }
 
-//void MainWindow::on_searchInput_editingFinished()
-//{
-//    searchOutputModel.clear();
-//    const auto &resultList = searchEngine.search(ui->searchInput->text());
-
-//    for(const auto &result: resultList)
-//    {
-//        addFile(result);
-//    }
-//}
-
 void MainWindow::on_searchResultTreeView_activated(const QModelIndex &index)
 {
     QString path =  QDir(filesModel.rootPath()).absoluteFilePath(searchOutputModel.data(index).toString());
@@ -99,7 +84,7 @@ void MainWindow::indexingFinished()
 void MainWindow::on_searchInput_textChanged(const QString &arg1)
 {
     searchOutputModel.clear();
-    const auto &resultList = searchEngine.search(ui->searchInput->text());
+    const auto &resultList = searchEngine.search(arg1);
 
     for(const auto &result: resultList)
     {

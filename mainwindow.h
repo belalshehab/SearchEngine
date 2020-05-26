@@ -39,7 +39,10 @@ private slots:
 
     void on_searchInput_textChanged(const QString &arg1);
 
+    void on_searchInput_returnPressed();
+
     void on_indexingButton_clicked();
+
 
 private:
     Ui::MainWindow *ui;

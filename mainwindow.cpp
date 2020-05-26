@@ -77,7 +77,6 @@ void MainWindow::indexingFinished(qint64 time)
 
     QMessageBox message(QMessageBox::Icon::Information, "info", string.arg(time /1000.0));
     message.exec();
-//    qInfo() << "indexingFinished in " << ;
 }
 
 void MainWindow::on_searchInput_textChanged(const QString &arg1)
@@ -89,6 +88,11 @@ void MainWindow::on_searchInput_textChanged(const QString &arg1)
     {
         addFile(result);
     }
+}
+
+void MainWindow::on_searchInput_returnPressed()
+{
+    on_searchInput_textChanged(ui->searchInput->text());
 }
 
 void MainWindow::on_indexingButton_clicked()
@@ -103,4 +107,5 @@ void MainWindow::on_indexingButton_clicked()
     connect(&progress, &QProgressDialog::canceled, &searchEngine, &SearchEngine::abortIndexing);
     searchEngine.makeIndex(filesModel.rootPath());
 }
+
 

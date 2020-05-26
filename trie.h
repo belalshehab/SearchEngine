@@ -22,40 +22,42 @@ class Trie
 
         bool hasData;
 
-
+        Node(const Node &other) = delete;
+        Node(Node &&other) = delete;
         Node(QChar c): key(c), hasData(false)
         {
         }
 
-        bool operator==(const Node &other)
+        ~Node()
         {
-            return key == other.key;
+            for(Node * child: childrens)
+            {
+                delete child;
+            }
         }
-
-        bool operator==(QChar c)
-        {
-            return key == c;
-        }
-
     };
 
 public:
     Trie();
+    ~Trie();
+
+    Trie(const Trie &) = delete;
+    Trie(Trie &&) = delete;
 
     ValueType &insert(const QString &key);
 
-    ValueType &insert(const QString &key, const ValueType &value);
-
-    const ValueType &operator[](const QString &key) const;
-
     ValueType &operator[](const QString &key);
 
-    std::pair<bool, ValueType> search(const QString &key) const;
+    ValueType &operator[](const QString &key) const;
+
+    std::pair<bool, ValueType &> search(const QString &key) const;
     ValueType searchPrefix(const QString &key) const;
 
     QVector<std::pair<QString, ValueType> > getData() const;
 
     QVector<std::pair<QString, ValueType> > traverse(QString word = "", Node *node = nullptr);
+
+    void clear();
 
 private:
     Node *m_root;
@@ -67,10 +69,21 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 template<class ValueType>
 Trie<ValueType>::Trie():
     m_root(new Node(' ')), m_size(0)
 {
+}
+
+template<class ValueType>
+Trie<ValueType>::~Trie()
+{
+    if(m_root)
+    {
+        delete m_root;
+        m_root = nullptr;
+    }
 }
 
 
@@ -84,7 +97,7 @@ ValueType &Trie<ValueType>::insert(const QString &key)
     for(const QChar &c: key)
     {
         auto itr = std::find_if(node->childrens.begin(), node->childrens.end(), [=](Node *node){
-            return *node == c;
+            return node->key == c;
         });
 
         if(itr == node->childrens.end())
@@ -105,21 +118,23 @@ ValueType &Trie<ValueType>::insert(const QString &key)
         node->hasData = true;
         m_vector.push_back({key, node});
     }
-
     return node->data;
 }
 
 template<class ValueType>
-ValueType &Trie<ValueType>::insert(const QString &key, const ValueType &value)
+ValueType &Trie<ValueType>::operator[](const QString &key)
 {
-    ValueType data = insert(key);
-
-    data = value;
-    return data;
+    return insert(key);
 }
 
 template<class ValueType>
-const ValueType &Trie<ValueType>::operator[](const QString &key) const
+ValueType &Trie<ValueType>::operator[](const QString &key) const
+{
+    return search(key).second;
+}
+
+template<class ValueType>
+std::pair<bool, ValueType &> Trie<ValueType>::search(const QString &key) const
 {
     Node *node = m_root;
 
@@ -131,37 +146,7 @@ const ValueType &Trie<ValueType>::operator[](const QString &key) const
 
         if(itr == node->childrens.end())
         {
-            return {};
-        }
-        else
-        {
-            node = *itr;
-        }
-    }
-    return node->data;
-}
-
-template<class ValueType>
-ValueType &Trie<ValueType>::operator[](const QString &key)
-{
-    return insert(key);
-}
-
-
-template<class ValueType>
-std::pair<bool, ValueType> Trie<ValueType>::search(const QString &key) const
-{
-    Node *node = m_root;
-
-    for(const QChar &c: key)
-    {
-        auto itr = std::find_if(node->childrens.begin(), node->childrens.end(), [=](Node *node){
-            return *node == c;
-        });
-
-        if(itr == node->childrens.end())
-        {
-            return {false, {}};
+            return {false, m_root->data};
         }
         else
         {
@@ -202,11 +187,25 @@ QVector<std::pair<QString, ValueType> > Trie<ValueType>::traverse(QString word, 
     {
         if(child->hasData)
         {
-//            qInfo() << word << ": " << child->data;
+            //            qInfo() << word << ": " << child->data;
             m_vector2.push_back({word, child->data});
         }
         return traverse(word + child->key, child);
     }
+}
+
+template<class ValueType>
+void Trie<ValueType>::clear()
+{
+    if(m_root)
+    {
+        if(m_root->childrens.isEmpty() == false)
+        {
+            delete m_root;
+            m_root = new Node(' ');
+        }
+    }
+
 }
 
 #endif // TRIE_H

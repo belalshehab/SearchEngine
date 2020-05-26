@@ -41,6 +41,10 @@ private slots:
 
     void on_indexingButton_clicked();
 
+
+    void directoryLoaded(const QString &path);
+
+
 private:
     Ui::MainWindow *ui;
     QFileSystemModel filesModel;

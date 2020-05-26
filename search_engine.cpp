@@ -20,6 +20,7 @@ SearchEngine::SearchEngine(QObject *parent) : QObject(parent),
 
 void SearchEngine::makeIndex(const QString &dirPath)
 {
+    indexTable.clear();
     dir.setPath(dirPath);
 
     QElapsedTimer timer;
@@ -36,7 +37,7 @@ void SearchEngine::makeIndex(const QString &dirPath)
         QDataStream stream(&indexFile);
         stream.setVersion(QDataStream::Qt_5_12);
 
-//        stream >> indexTable;
+        //        stream >> indexTable;
 
         qInfo() << "Read index took " << timer.elapsed() << "Ms";
     }
@@ -47,8 +48,8 @@ void SearchEngine::makeIndex(const QString &dirPath)
 
         int count = listOfFilesNames.count();
 
-        // num_threads(1)
-#pragma omp parallel for schedule(dynamic)
+
+#pragma omp parallel for schedule(dynamic) //num_threads(1)
         for(int i = 0; i < count; ++i)
         {
 
@@ -115,6 +116,7 @@ QVector<QString> SearchEngine::search(const QString &word) const
 {
     QVector<QString> vec;
     auto x = indexTable[word].getData();
+
     for(int i = 0; i < x.size(); ++i)
     {
         vec.push_back(x[i].first);

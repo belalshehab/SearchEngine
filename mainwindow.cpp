@@ -37,6 +37,8 @@ void MainWindow::init()
     ui->searchResultTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     connect(&searchEngine, &SearchEngine::indexingFinished, this, &MainWindow::indexingFinished);
+
+    connect(&filesModel, &QFileSystemModel::directoryLoaded, this, &MainWindow::directoryLoaded);
 }
 
 
@@ -96,4 +98,9 @@ void MainWindow::on_indexingButton_clicked()
     connect(&searchEngine, &SearchEngine::progressChanged, &progress, &QProgressDialog::setValue);
     connect(&progress, &QProgressDialog::canceled, &searchEngine, &SearchEngine::abortIndexing);
     searchEngine.makeIndex(filesModel.rootPath());
+}
+
+void MainWindow::directoryLoaded(const QString &path)
+{
+    qInfo() << "loading " << path << " finished";
 }

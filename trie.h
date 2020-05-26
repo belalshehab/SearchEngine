@@ -51,7 +51,6 @@ public:
     ValueType &operator[](const QString &key) const;
 
     std::pair<bool, ValueType &> search(const QString &key) const;
-    ValueType searchPrefix(const QString &key) const;
 
     QVector<std::pair<QString, ValueType> > getData() const;
 
@@ -158,12 +157,6 @@ std::pair<bool, ValueType &> Trie<ValueType>::search(const QString &key) const
     }
 
     return {node->hasData, node->data};
-}
-
-template<class ValueType>
-ValueType Trie<ValueType>::searchPrefix(const QString &key) const
-{
-    return {};
 }
 
 template<class ValueType>

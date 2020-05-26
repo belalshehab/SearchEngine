@@ -48,7 +48,5 @@ private:
 
     SearchEngine searchEngine;
     QFuture<void> future;
-
-//    QProgressDialog progress;
 };
 #endif // MAINWINDOW_H

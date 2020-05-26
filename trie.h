@@ -55,11 +55,14 @@ public:
 
     QVector<std::pair<QString, ValueType> > getData() const;
 
+    QVector<std::pair<QString, ValueType> > traverse(QString word = "", Node *node = nullptr);
+
 private:
     Node *m_root;
 
     QVector<std::pair<QString, Node *> > m_vector;
 
+    QVector<std::pair<QString, ValueType> > m_vector2;
     int m_size;
 };
 
@@ -123,7 +126,7 @@ const ValueType &Trie<ValueType>::operator[](const QString &key) const
     for(const QChar &c: key)
     {
         auto itr = std::find_if(node->childrens.begin(), node->childrens.end(), [=](Node *node){
-            return *node == c;
+            return node->key == c;
         });
 
         if(itr == node->childrens.end())
@@ -184,6 +187,26 @@ QVector<std::pair<QString, ValueType> > Trie<ValueType>::getData() const
         vec.push_back({elemnt.first, elemnt.second->data});
     }
     return vec;
+}
+
+template<class ValueType>
+QVector<std::pair<QString, ValueType> > Trie<ValueType>::traverse(QString word, Node *node)
+{
+    if(node == nullptr || node == m_root)
+    {
+        node = m_root;
+        word = "";
+    }
+
+    for(Node *child : node->childrens)
+    {
+        if(child->hasData)
+        {
+//            qInfo() << word << ": " << child->data;
+            m_vector2.push_back({word, child->data});
+        }
+        return traverse(word + child->key, child);
+    }
 }
 
 #endif // TRIE_H

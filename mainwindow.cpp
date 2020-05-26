@@ -36,12 +36,7 @@ void MainWindow::init()
 
     ui->searchResultTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-
     connect(&searchEngine, &SearchEngine::indexingFinished, this, &MainWindow::indexingFinished);
-
-//    connect(&searchEngine, &SearchEngine::progressChanged, this, [](float value){
-//        qInfo() << value;
-//    });
 }
 
 
@@ -50,8 +45,10 @@ void MainWindow::on_browsButton_clicked()
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::DirectoryOnly);
 
-    dialog.exec();
-    ui->filesListView->setRootIndex(filesModel.setRootPath(dialog.directory().path()));
+    if(dialog.exec())
+    {
+        ui->filesListView->setRootIndex(filesModel.setRootPath(dialog.directory().path()));
+    }
 }
 
 void MainWindow::on_filesListView_activated(const QModelIndex &index)
@@ -77,7 +74,7 @@ void MainWindow::on_searchResultTreeView_activated(const QModelIndex &index)
 void MainWindow::indexingFinished()
 {
     QMessageBox message(QMessageBox::Icon::Information, "info", "indexing finished");
-//    message.open();
+    message.exec();
     qInfo() << "indexingFinished";
 }
 
@@ -98,6 +95,5 @@ void MainWindow::on_indexingButton_clicked()
     progress.setWindowModality(Qt::WindowModal);
     connect(&searchEngine, &SearchEngine::progressChanged, &progress, &QProgressDialog::setValue);
     connect(&progress, &QProgressDialog::canceled, &searchEngine, &SearchEngine::abortIndexing);
-//    future = QtConcurrent::run(&searchEngine, &SearchEngine::makeIndex, filesModel.rootPath());
     searchEngine.makeIndex(filesModel.rootPath());
 }

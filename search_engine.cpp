@@ -25,8 +25,9 @@ void SearchEngine::makeIndex(const QString &dirPath)
     QElapsedTimer timer;
     timer.start();
 
+
     if(false)
-//    if(dir.exists("index.indx"))
+        //    if(dir.exists("index.indx"))
     {
         QFile indexFile(dir.absoluteFilePath("index.indx"));
 
@@ -65,7 +66,6 @@ void SearchEngine::makeIndex(const QString &dirPath)
             if(i %100 == 0)
             {
                 QApplication::processEvents();
-                //                            qInfo() << " In file number " << i << " from total " << count << " " << (float(i) / count) *100 << "%";
                 emit progressChanged((float(i) / count) *100);
             }
 
@@ -84,19 +84,19 @@ void SearchEngine::makeIndex(const QString &dirPath)
         if(!stop)
         {
             qInfo() << "indexing took " << timer.restart() /1000.0 << "Sec";
-//            qInfo() << "saving the index table";
+            //            qInfo() << "saving the index table";
 
-//            QFile output(dir.absoluteFilePath("index.indx"));
+            //            QFile output(dir.absoluteFilePath("index.indx"));
 
-//            QDataStream dataStream(&output);
+            //            QDataStream dataStream(&output);
 
-//            dataStream.setVersion(QDataStream::Qt_5_12);
+            //            dataStream.setVersion(QDataStream::Qt_5_12);
 
-//            output.open(QIODevice::WriteOnly);
+            //            output.open(QIODevice::WriteOnly);
 
-//            dataStream << indexTable;
+            //            dataStream << indexTable;
 
-//            qInfo() << "saving index took " << timer.restart() << "Ms";
+            //            qInfo() << "saving index took " << timer.restart() << "Ms";
         }
     }
 
@@ -121,7 +121,6 @@ QVector<QString> SearchEngine::search(const QString &word) const
     }
 
     return vec;
-
 }
 
 void SearchEngine::abortIndexing()

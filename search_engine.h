@@ -31,13 +31,7 @@ public slots:
     void abortIndexing();
 
 private:
-//    QMap<QString, QSet<QString> > indexTable;
-    //   word  files   fileName setOf line numbers
-//    QMap<QString, QMap<QString, QSet<int> > > indexTable;
-
     Trie<Trie<QString> > indexTable;
-
-
     QDir dir;
     bool stop;
 };

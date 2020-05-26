@@ -7,7 +7,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , ui(new Ui::MainWindow), searchEngine(this)
 {
     ui->setupUi(this);
     init();
@@ -31,7 +31,10 @@ void MainWindow::init()
 
     ui->searchResultTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    connect(ui->indexingButton, &QPushButton::clicked, this, &MainWindow::makeIndex);
     connect(&searchEngine, &SearchEngine::indexingFinished, this, &MainWindow::indexingFinished);
+    connect(&searchEngine, &SearchEngine::filesAdded, this, &MainWindow::filesAdded);
+    connect(&searchEngine, &SearchEngine::filesRemoved, this, &MainWindow::filesRemoved);
 }
 
 
@@ -90,7 +93,6 @@ void MainWindow::on_searchInput_textChanged(const QString &arg1)
     {
         QStandardItem *item = new QStandardItem(result.first);
         searchOutputModel.invisibleRootItem()->appendRow(item);
-
     }
 }
 
@@ -99,7 +101,7 @@ void MainWindow::on_searchInput_returnPressed()
     on_searchInput_textChanged(ui->searchInput->text());
 }
 
-void MainWindow::on_indexingButton_clicked()
+void MainWindow::makeIndex()
 {
     if(searchEngine.running())
     {
@@ -110,6 +112,23 @@ void MainWindow::on_indexingButton_clicked()
     connect(&searchEngine, &SearchEngine::progressChanged, &progress, &QProgressDialog::setValue);
     connect(&progress, &QProgressDialog::canceled, &searchEngine, &SearchEngine::abortIndexing);
     searchEngine.makeIndex(filesModel.rootPath());
+}
+
+void MainWindow::filesAdded()
+{
+    QString string = "files has been added to the directory and the index has been updated";
+
+    QMessageBox message(QMessageBox::Icon::Information, "info", string);
+    message.exec();
+}
+
+void MainWindow::filesRemoved()
+{
+    QString string = "files has been removed from the directory need to remake the index";
+
+    QMessageBox message(QMessageBox::Icon::Information, "warn", string);
+    message.exec();
+    makeIndex();
 }
 
 

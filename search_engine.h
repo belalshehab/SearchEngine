@@ -6,6 +6,7 @@
 #include <QSet>
 #include <QDir>
 #include <QString>
+#include <QFileSystemWatcher>
 
 #include "trie.h"
 
@@ -27,14 +28,22 @@ private:
 
 signals:
     void progressChanged(float percentage);
+    void indexingStarted();
     void indexingFinished(qint64 Ms);
     void searchFinished();
+
+    void filesAdded();
+    void filesRemoved();
 public slots:
     void abortIndexing();
+    void directoryChanged(const QString &);
 
 private:
     Trie<Trie<int> > m_indexTable;
     QDir m_dir;
+    QFileSystemWatcher m_fsw;
+
+
     bool m_stop;
     bool m_running;
 };

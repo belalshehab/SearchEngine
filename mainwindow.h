@@ -40,7 +40,10 @@ private slots:
 
     void on_searchInput_returnPressed();
 
-    void on_indexingButton_clicked();
+    void makeIndex();
+
+    void filesAdded();
+    void filesRemoved();
 
 
 private:

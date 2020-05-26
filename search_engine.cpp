@@ -13,15 +13,20 @@
 
 
 SearchEngine::SearchEngine(QObject *parent) : QObject(parent),
-    dir("", "", QDir::Name, QDir::Files), stop(false)
+    m_dir("", "", QDir::Name, QDir::Files), m_stop(false), m_running(false)
 {
 
 }
 
 void SearchEngine::makeIndex(const QString &dirPath)
 {
-    indexTable.clear();
-    dir.setPath(dirPath);
+    if(m_running)
+    {
+        return;
+    }
+    m_running = true;
+    m_indexTable.clear();
+    m_dir.setPath(dirPath);
 
     QElapsedTimer timer;
     timer.start();
@@ -30,7 +35,7 @@ void SearchEngine::makeIndex(const QString &dirPath)
     if(false)
         //    if(dir.exists("index.indx"))
     {
-        QFile indexFile(dir.absoluteFilePath("index.indx"));
+        QFile indexFile(m_dir.absoluteFilePath("index.indx"));
 
         indexFile.open(QIODevice::ReadOnly);
 
@@ -44,7 +49,7 @@ void SearchEngine::makeIndex(const QString &dirPath)
 
     else
     {
-        QStringList listOfFilesNames = dir.entryList();
+        QStringList listOfFilesNames = m_dir.entryList();
 
         int count = listOfFilesNames.count();
 
@@ -53,7 +58,7 @@ void SearchEngine::makeIndex(const QString &dirPath)
         for(int i = 0; i < count; ++i)
         {
 
-            if(stop)
+            if(m_stop)
             {
                 break;
             }
@@ -62,7 +67,7 @@ void SearchEngine::makeIndex(const QString &dirPath)
             {
                 fileName = listOfFilesNames[i];
             }
-            QString absoluteFileName{dir.absoluteFilePath(fileName)};
+            QString absoluteFileName{m_dir.absoluteFilePath(fileName)};
 
             if(i %100 == 0)
             {
@@ -78,13 +83,12 @@ void SearchEngine::makeIndex(const QString &dirPath)
             {
 #pragma omp critical(sec2)
                 {
-                    indexTable[QString::fromStdString(word)].insert(fileName);
+                    m_indexTable[QString::fromStdString(word)].insert(fileName);
                 }
             }
         }
-        if(!stop)
+        if(!m_stop)
         {
-            qInfo() << "indexing took " << timer.restart() /1000.0 << "Sec";
             //            qInfo() << "saving the index table";
 
             //            QFile output(dir.absoluteFilePath("index.indx"));
@@ -101,21 +105,22 @@ void SearchEngine::makeIndex(const QString &dirPath)
         }
     }
 
-    if(stop)
+    if(m_stop)
     {
-        stop = false;
+        m_stop = false;
     }
     else
     {
-        emit indexingFinished();
+        emit indexingFinished(timer.restart());
     }
+    m_running = false;
 }
 
 
 QVector<QString> SearchEngine::search(const QString &word) const
 {
     QVector<QString> vec;
-    auto x = indexTable[word].getData();
+    auto x = m_indexTable[word].getData();
 
     for(int i = 0; i < x.size(); ++i)
     {
@@ -127,6 +132,11 @@ QVector<QString> SearchEngine::search(const QString &word) const
 
 void SearchEngine::abortIndexing()
 {
-    stop = true;
+    m_stop = true;
+}
+
+bool SearchEngine::running() const
+{
+    return m_running;
 }
 

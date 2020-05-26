@@ -37,8 +37,6 @@ void MainWindow::init()
     ui->searchResultTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     connect(&searchEngine, &SearchEngine::indexingFinished, this, &MainWindow::indexingFinished);
-
-    connect(&filesModel, &QFileSystemModel::directoryLoaded, this, &MainWindow::directoryLoaded);
 }
 
 
@@ -73,11 +71,13 @@ void MainWindow::on_searchResultTreeView_activated(const QModelIndex &index)
     ui->fileText->setText(file.readAll());
 }
 
-void MainWindow::indexingFinished()
+void MainWindow::indexingFinished(qint64 time)
 {
-    QMessageBox message(QMessageBox::Icon::Information, "info", "indexing finished");
+    QString string = "indexing finished in %1 Sec";
+
+    QMessageBox message(QMessageBox::Icon::Information, "info", string.arg(time /1000.0));
     message.exec();
-    qInfo() << "indexingFinished";
+//    qInfo() << "indexingFinished in " << ;
 }
 
 void MainWindow::on_searchInput_textChanged(const QString &arg1)
@@ -93,6 +93,10 @@ void MainWindow::on_searchInput_textChanged(const QString &arg1)
 
 void MainWindow::on_indexingButton_clicked()
 {
+    if(searchEngine.running())
+    {
+        return;
+    }
     QProgressDialog progress("Making index", "Abort indexing", 0, 100, this);
     progress.setWindowModality(Qt::WindowModal);
     connect(&searchEngine, &SearchEngine::progressChanged, &progress, &QProgressDialog::setValue);
@@ -100,7 +104,3 @@ void MainWindow::on_indexingButton_clicked()
     searchEngine.makeIndex(filesModel.rootPath());
 }
 
-void MainWindow::directoryLoaded(const QString &path)
-{
-    qInfo() << "loading " << path << " finished";
-}

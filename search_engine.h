@@ -21,19 +21,22 @@ public:
     QVector<QString> search(const QString &word) const;
 
 
+    bool running() const;
+
 private:
 
 signals:
     void progressChanged(float percentage);
-    void indexingFinished();
+    void indexingFinished(qint64 Ms);
     void searchFinished();
 public slots:
     void abortIndexing();
 
 private:
-    Trie<Trie<QString> > indexTable;
-    QDir dir;
-    bool stop;
+    Trie<Trie<QString> > m_indexTable;
+    QDir m_dir;
+    bool m_stop;
+    bool m_running;
 };
 
 #endif // INVERTEDINDEX_H

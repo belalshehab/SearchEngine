@@ -35,15 +35,11 @@ private slots:
 
     void on_searchResultTreeView_activated(const QModelIndex &index);
 
-    void indexingFinished();
+    void indexingFinished(qint64 time);
 
     void on_searchInput_textChanged(const QString &arg1);
 
     void on_indexingButton_clicked();
-
-
-    void directoryLoaded(const QString &path);
-
 
 private:
     Ui::MainWindow *ui;

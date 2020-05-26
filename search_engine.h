@@ -18,7 +18,7 @@ public:
 
     void makeIndex(const QString &dirPath);
 
-    QVector<QString> search(const QString &word) const;
+    QVector<std::pair<QString, int> > search(const QString &word) const;
 
 
     bool running() const;
@@ -33,7 +33,7 @@ public slots:
     void abortIndexing();
 
 private:
-    Trie<Trie<QString> > m_indexTable;
+    Trie<Trie<int> > m_indexTable;
     QDir m_dir;
     bool m_stop;
     bool m_running;

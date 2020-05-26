@@ -18,18 +18,13 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::addFile(const QString &name)
-{
-    QStandardItem *item = new QStandardItem(name);
-    searchOutputModel.invisibleRootItem()->appendRow(item);
-}
-
 void MainWindow::init()
 {
     //setup the list
     ui->filesListView->setModel(&filesModel);
 
     filesModel.setFilter(QDir::Filter::Files);
+
     ui->filesListView->setRootIndex(filesModel.setRootPath(QDir::homePath()));
 
     ui->searchResultTreeView->setModel(&searchOutputModel);
@@ -82,11 +77,20 @@ void MainWindow::indexingFinished(qint64 time)
 void MainWindow::on_searchInput_textChanged(const QString &arg1)
 {
     searchOutputModel.clear();
-    const auto &resultList = searchEngine.search(arg1);
+    QStringList headers;
+    headers << "File Name";
+    searchOutputModel.setHorizontalHeaderLabels(headers);
+
+    QVector<std::pair<QString, int> > resultList = searchEngine.search(arg1);
+
+
+    ui->searchSize->setText(QString::number(resultList.count()));
 
     for(const auto &result: resultList)
     {
-        addFile(result);
+        QStandardItem *item = new QStandardItem(result.first);
+        searchOutputModel.invisibleRootItem()->appendRow(item);
+
     }
 }
 

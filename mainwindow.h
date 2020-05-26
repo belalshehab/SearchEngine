@@ -24,7 +24,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void addFile(const QString &name);
 private:
     void init();
 private slots:

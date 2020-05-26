@@ -59,6 +59,8 @@ public:
 
     void clear();
 
+    bool IsEmpty() const;
+
 private:
     Node *m_root;
 
@@ -117,6 +119,7 @@ ValueType &Trie<ValueType>::insert(const QString &key)
     {
         node->hasData = true;
         m_vector.push_back({key, node});
+        ++m_size;
     }
     return node->data;
 }
@@ -205,7 +208,17 @@ void Trie<ValueType>::clear()
             m_root = new Node(' ');
         }
     }
+    m_size = 0;
+}
 
+template<class ValueType>
+bool Trie<ValueType>::IsEmpty() const
+{
+    if(m_root)
+    {
+        return m_root->childrens.isEmpty();
+    }
+    return false;
 }
 
 #endif // TRIE_H

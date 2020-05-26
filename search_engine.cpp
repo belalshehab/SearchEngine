@@ -83,7 +83,7 @@ void SearchEngine::makeIndex(const QString &dirPath)
             {
 #pragma omp critical(sec2)
                 {
-                    m_indexTable[QString::fromStdString(word)].insert(fileName);
+                    m_indexTable.insert(QString::fromStdString(word)).insert(fileName);
                 }
             }
         }
@@ -117,17 +117,9 @@ void SearchEngine::makeIndex(const QString &dirPath)
 }
 
 
-QVector<QString> SearchEngine::search(const QString &word) const
+QVector<std::pair<QString, int> > SearchEngine::search(const QString &word) const
 {
-    QVector<QString> vec;
-    auto x = m_indexTable[word].getData();
-
-    for(int i = 0; i < x.size(); ++i)
-    {
-        vec.push_back(x[i].first);
-    }
-
-    return vec;
+    return  m_indexTable[word].getData();
 }
 
 void SearchEngine::abortIndexing()

@@ -2,8 +2,8 @@
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
-#include <QtConcurrent/QtConcurrent>
 #include <QMessageBox>
+#include <QTextCharFormat>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -65,8 +65,33 @@ void MainWindow::on_searchResultTreeView_activated(const QModelIndex &index)
 
     QFile file(path);
     file.open(QIODevice::ReadOnly);
+    QString fileText = file.readAll();
 
-    ui->fileText->setText(file.readAll());
+    QString word = ui->searchInput->text();
+    QRegularExpression query(word);
+
+    ui->fileText->setText(fileText);
+
+    QTextCharFormat fmt;
+    fmt.setBackground(Qt::yellow);
+    QTextCursor cursor(ui->fileText->document());
+
+    int startPos = 0;
+    bool left, right;
+    while((startPos = fileText.indexOf(query, startPos)) != -1)
+    {
+        left = startPos == 0 ? true : fileText[startPos -1].isSpace();
+
+        right = (startPos + word.length()) == (fileText.length()) ? true : fileText[startPos + word.length()].isSpace();
+
+        if(left && right)
+        {
+            cursor.setPosition(startPos, QTextCursor::MoveAnchor);
+            cursor.setPosition(startPos + word.length(), QTextCursor::KeepAnchor);
+            cursor.setCharFormat(fmt);
+        }
+        ++startPos;
+    }
 }
 
 void MainWindow::indexingFinished(qint64 time)

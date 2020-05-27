@@ -143,7 +143,7 @@ void SearchEngine::directoryChanged(const QString &)
                 {
                     continue;
                 }
-                m_indexTable.insert(word).insert(fileName);
+                m_indexTable.insert(word.toLower()).insert(fileName);
             }
         }
         emit filesAdded();

@@ -77,7 +77,7 @@ void MainWindow::on_searchResultTreeView_activated(const QModelIndex &index)
 
     int startPos = 0;
     bool left, right;
-    while((startPos = fileText.indexOf(query, startPos)) != -1)
+    while((startPos = fileText.indexOf(query, startPos, Qt::CaseInsensitive)) != -1)
     {
         left = startPos == 0 ? true : fileText[startPos -1].isSpace();
 

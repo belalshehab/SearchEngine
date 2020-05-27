@@ -1,12 +1,11 @@
 #ifndef TRIE_H
 #define TRIE_H
 #include <QString>
-#include <QLinkedList>
 #include <QVector>
 #include <QMap>
 #include <QDebug>
 
-#include <utility>
+#include <algorithm>
 
 template<class ValueType>
 class Trie
@@ -15,7 +14,7 @@ class Trie
     {
         QChar key;
 
-        QLinkedList<Node *> childrens;
+        QVector<Node *> childrens;
 
         ValueType data;
 
@@ -182,7 +181,6 @@ QVector<std::pair<QString, ValueType> > Trie<ValueType>::traverse(QString word, 
     {
         if(child->hasData)
         {
-            //            qInfo() << word << ": " << child->data;
             m_vector2.push_back({word, child->data});
         }
         return traverse(word + child->key, child);
@@ -194,7 +192,7 @@ void Trie<ValueType>::clear()
 {
     if(m_root)
     {
-        if(m_root->childrens.isEmpty() == false)
+        if(!m_root->childrens.isEmpty())
         {
             delete m_root;
             m_root = new Node(' ');

@@ -79,7 +79,7 @@ void SearchEngine::makeIndex(const QString &dirPath)
             }
 #pragma omp critical(sec2)
             {
-                m_indexTable.insert(word.toLower()).insert(fileName);
+                m_indexTable.insert(word.toLower()).insert(fileName).push_back(true);
             }
         }
     }
@@ -97,7 +97,7 @@ void SearchEngine::makeIndex(const QString &dirPath)
 }
 
 
-QVector<std::pair<QString, int> > SearchEngine::search(const QString &word) const
+QVector<std::pair<QString, QVector<bool> > > SearchEngine::search(const QString &word) const
 {
     if(word.isEmpty())
     {

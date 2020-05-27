@@ -61,7 +61,7 @@ void MainWindow::on_filesListView_activated(const QModelIndex &index)
 
 void MainWindow::on_searchResultTreeView_activated(const QModelIndex &index)
 {
-    QString path =  QDir(filesModel.rootPath()).absoluteFilePath(searchOutputModel.data(index).toString());
+    QString path =  QDir(filesModel.rootPath()).absoluteFilePath(searchOutputModel.data(index.siblingAtColumn(0)).toString());
 
     QFile file(path);
     file.open(QIODevice::ReadOnly);
@@ -104,19 +104,22 @@ void MainWindow::indexingFinished(qint64 time)
 void MainWindow::on_searchInput_textChanged(const QString &arg1)
 {
     searchOutputModel.clear();
+
+    QVector<std::pair<QString, QVector<bool> > > resultList = searchEngine.search(arg1);
+
     QStringList headers;
-    headers << "File Name";
+    headers << "File Name" << "Count";
     searchOutputModel.setHorizontalHeaderLabels(headers);
 
-    QVector<std::pair<QString, int> > resultList = searchEngine.search(arg1);
-
-
-    ui->searchSize->setText(QString::number(resultList.count()));
+    ui->searchSize->setText("Number of files: " + QString::number(resultList.count()));
 
     for(const auto &result: resultList)
     {
-        QStandardItem *item = new QStandardItem(result.first);
-        searchOutputModel.invisibleRootItem()->appendRow(item);
+        QList<QStandardItem *> items;
+        items.append(new QStandardItem(result.first));
+        items.append(new QStandardItem(QString::number(result.second.count())));
+
+        searchOutputModel.invisibleRootItem()->appendRow(items);
     }
 }
 

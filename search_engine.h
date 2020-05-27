@@ -27,13 +27,14 @@ public:
 private:
 
 signals:
-    void progressChanged(float percentage);
-    void indexingStarted();
-    void indexingFinished(qint64 Ms);
-    void searchFinished();
+    void progressChanged(float percentage) const;
+    void indexingStarted() const;
+    void indexingFinished(qint64 Ms) const;
+    void searchFinished(qint64 nano) const;
 
-    void filesAdded();
-    void filesRemoved();
+    void filesAdded() const;
+    void filesRemoved() const;
+
 public slots:
     void abortIndexing();
     void directoryChanged(const QString &);

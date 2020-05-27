@@ -40,6 +40,8 @@ private slots:
 
     void on_searchInput_returnPressed();
 
+    void onSearchFinished(qint64 nano);
+
     void makeIndex();
 
     void filesAdded();

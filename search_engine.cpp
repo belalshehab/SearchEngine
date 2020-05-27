@@ -99,11 +99,15 @@ void SearchEngine::makeIndex(const QString &dirPath)
 
 QVector<std::pair<QString, QVector<bool> > > SearchEngine::search(const QString &word) const
 {
+    QElapsedTimer timer;
+    timer.start();
     if(word.isEmpty())
     {
         return {};
     }
-    return  m_indexTable[word.toLower()].getData();
+    auto result {m_indexTable[word.toLower().trimmed()].getData()};
+    emit searchFinished(timer.nsecsElapsed());
+    return result;
 }
 
 void SearchEngine::abortIndexing()
@@ -143,7 +147,7 @@ void SearchEngine::directoryChanged(const QString &)
                 {
                     continue;
                 }
-                m_indexTable.insert(word.toLower()).insert(fileName);
+                m_indexTable.insert(word.toLower()).insert(fileName).push_back(true);
             }
         }
         emit filesAdded();

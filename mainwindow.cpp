@@ -35,6 +35,8 @@ void MainWindow::init()
     connect(&searchEngine, &SearchEngine::indexingFinished, this, &MainWindow::indexingFinished);
     connect(&searchEngine, &SearchEngine::filesAdded, this, &MainWindow::filesAdded);
     connect(&searchEngine, &SearchEngine::filesRemoved, this, &MainWindow::filesRemoved);
+    connect(&searchEngine, &SearchEngine::searchFinished, this, &MainWindow::onSearchFinished);
+
 }
 
 
@@ -126,6 +128,25 @@ void MainWindow::on_searchInput_textChanged(const QString &arg1)
 void MainWindow::on_searchInput_returnPressed()
 {
     on_searchInput_textChanged(ui->searchInput->text());
+}
+
+void MainWindow::onSearchFinished(qint64 nano)
+{
+    double time = nano /1000.0;
+
+
+
+    QString timeStr;
+    if(time > 1000)
+    {
+        timeStr = QString::number(time /1000.0, 'f', 2) + "Ms";
+    }
+    else
+    {
+        timeStr = QString::number(time, 'f', 2) + "Us";
+    }
+    QString message = "Search took " + timeStr;
+    ui->statusbar->showMessage(message);
 }
 
 void MainWindow::makeIndex()

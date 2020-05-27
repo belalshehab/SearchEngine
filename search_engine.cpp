@@ -3,15 +3,11 @@
 #include <QDebug>
 #include <QStringList>
 #include <QFile>
-#include <QDataStream>
+#include <QTextStream>
 #include <QApplication>
 #include <QElapsedTimer>
 
-#include <iostream>
 #include <omp.h>
-#include <fstream>
-#include <algorithm>
-
 
 SearchEngine::SearchEngine(QObject *parent) : QObject(parent),
     m_dir("", "", QDir::Name, QDir::Files), m_stop(false), m_running(false)
@@ -67,15 +63,23 @@ void SearchEngine::makeIndex(const QString &dirPath)
             emit progressChanged((float(i) / count) *100);
         }
 
-        std::ifstream file(absoluteFileName.toStdString());
+        QFile file(absoluteFileName);
+        file.open(QFile::ReadOnly);
 
-        std::string word;
+        QTextStream stream(&file);
 
-        while(file >> word)
+        QString word;
+
+        while (stream.status() == QTextStream::Ok)
         {
+            stream >> word;
+            if(word.isEmpty())
+            {
+                continue;
+            }
 #pragma omp critical(sec2)
             {
-                m_indexTable.insert(QString::fromStdString(word)).insert(fileName);
+                m_indexTable.insert(word).insert(fileName);
             }
         }
     }
@@ -95,6 +99,10 @@ void SearchEngine::makeIndex(const QString &dirPath)
 
 QVector<std::pair<QString, int> > SearchEngine::search(const QString &word) const
 {
+    if(word.isEmpty())
+    {
+        return {};
+    }
     return  m_indexTable[word].getData();
 }
 
@@ -120,15 +128,22 @@ void SearchEngine::directoryChanged(const QString &)
     {
         for(const QString &fileName: added)
         {
-            std::ifstream file(m_dir.absoluteFilePath(fileName).toStdString());
+            QFile file(m_dir.absoluteFilePath(fileName));
+            file.open(QFile::ReadOnly);
 
-            std::string word;
+            QTextStream stream(&file);
 
-            while(file >> word)
+            QString word;
+
+
+            while (stream.status() == QTextStream::Ok)
             {
+                stream >> word;
+                if(word.isEmpty())
                 {
-                    m_indexTable.insert(QString::fromStdString(word)).insert(fileName);
+                    continue;
                 }
+                m_indexTable.insert(word).insert(fileName);
             }
         }
         emit filesAdded();

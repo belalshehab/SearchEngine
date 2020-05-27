@@ -7,7 +7,6 @@
 #include <QDebug>
 
 #include <utility>
-#include <algorithm>
 
 template<class ValueType>
 class Trie

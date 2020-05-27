@@ -67,8 +67,7 @@ void MainWindow::on_searchResultTreeView_activated(const QModelIndex &index)
     file.open(QIODevice::ReadOnly);
     QString fileText = file.readAll();
 
-    QString word = ui->searchInput->text();
-    QRegularExpression query(word);
+    QString query = ui->searchInput->text();
 
     ui->fileText->setText(fileText);
 
@@ -82,12 +81,12 @@ void MainWindow::on_searchResultTreeView_activated(const QModelIndex &index)
     {
         left = startPos == 0 ? true : fileText[startPos -1].isSpace();
 
-        right = (startPos + word.length()) == (fileText.length()) ? true : fileText[startPos + word.length()].isSpace();
+        right = (startPos + query.length()) == (fileText.length()) ? true : fileText[startPos + query.length()].isSpace();
 
         if(left && right)
         {
             cursor.setPosition(startPos, QTextCursor::MoveAnchor);
-            cursor.setPosition(startPos + word.length(), QTextCursor::KeepAnchor);
+            cursor.setPosition(startPos + query.length(), QTextCursor::KeepAnchor);
             cursor.setCharFormat(fmt);
         }
         ++startPos;

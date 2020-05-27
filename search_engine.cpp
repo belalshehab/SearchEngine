@@ -79,7 +79,7 @@ void SearchEngine::makeIndex(const QString &dirPath)
             }
 #pragma omp critical(sec2)
             {
-                m_indexTable.insert(word).insert(fileName);
+                m_indexTable.insert(word.toLower()).insert(fileName);
             }
         }
     }
@@ -103,7 +103,7 @@ QVector<std::pair<QString, int> > SearchEngine::search(const QString &word) cons
     {
         return {};
     }
-    return  m_indexTable[word].getData();
+    return  m_indexTable[word.toLower()].getData();
 }
 
 void SearchEngine::abortIndexing()

@@ -107,7 +107,7 @@ void MainWindow::on_searchInput_textChanged(const QString &arg1)
 {
     searchOutputModel.clear();
 
-    QVector<std::pair<QString, QVector<bool> > > resultList = searchEngine.search(arg1);
+    QVector<std::pair<QString, int> > resultList = searchEngine.search(arg1);
 
     QStringList headers;
     headers << "File Name" << "Count";
@@ -119,7 +119,7 @@ void MainWindow::on_searchInput_textChanged(const QString &arg1)
     {
         QList<QStandardItem *> items;
         items.append(new QStandardItem(result.first));
-        items.append(new QStandardItem(QString::number(result.second.count())));
+        items.append(new QStandardItem(QString::number(result.second)));
 
         searchOutputModel.invisibleRootItem()->appendRow(items);
     }

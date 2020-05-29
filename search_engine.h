@@ -19,7 +19,7 @@ public:
 
     void makeIndex(const QString &dirPath);
 
-    QVector<std::pair<QString, QVector<bool> > > search(const QString &word) const;
+    QVector<std::pair<QString, int> > search(const QString &word) const;
 
 
     bool running() const;
@@ -40,7 +40,7 @@ public slots:
     void directoryChanged(const QString &);
 
 private:
-    Trie<Trie<QVector<bool> > > m_indexTable;
+    Trie<Trie<int> > m_indexTable;
     QDir m_dir;
     QFileSystemWatcher m_fsw;
 

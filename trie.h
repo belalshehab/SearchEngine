@@ -2,7 +2,6 @@
 #define TRIE_H
 #include <QString>
 #include <QVector>
-#include <QMap>
 #include <QDebug>
 
 #include <algorithm>
@@ -42,7 +41,7 @@ public:
     Trie(const Trie &) = delete;
     Trie(Trie &&) = delete;
 
-    ValueType &insert(const QString &key);
+    std::pair<bool, ValueType &> insert(const QString &key);
 
     ValueType &operator[](const QString &key);
 
@@ -87,7 +86,7 @@ Trie<ValueType>::~Trie()
 
 
 template<class ValueType>
-ValueType &Trie<ValueType>::insert(const QString &key)
+std::pair<bool, ValueType &> Trie<ValueType>::insert(const QString &key)
 {
     Node *node = m_root;
 
@@ -118,13 +117,13 @@ ValueType &Trie<ValueType>::insert(const QString &key)
         m_vector.push_back({key, node});
         ++m_size;
     }
-    return node->data;
+    return {newFlag, node->data};
 }
 
 template<class ValueType>
 ValueType &Trie<ValueType>::operator[](const QString &key)
 {
-    return insert(key);
+    return insert(key).second;
 }
 
 template<class ValueType>

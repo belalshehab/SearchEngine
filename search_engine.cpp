@@ -45,7 +45,6 @@ void SearchEngine::makeIndex(const QString &dirPath)
 #pragma omp parallel for schedule(dynamic) //num_threads(1)
     for(int i = 0; i < count; ++i)
     {
-
         if(m_stop)
         {
             break;
@@ -79,7 +78,8 @@ void SearchEngine::makeIndex(const QString &dirPath)
             }
 #pragma omp critical(sec2)
             {
-                m_indexTable.insert(word.toLower()).insert(fileName).push_back(true);
+                std::pair<bool, int &> insertionResult = m_indexTable.insert(word.toLower()).second.insert(fileName);
+                insertionResult.second = insertionResult.first ? 1 : insertionResult.second +1;
             }
         }
     }
@@ -97,7 +97,7 @@ void SearchEngine::makeIndex(const QString &dirPath)
 }
 
 
-QVector<std::pair<QString, QVector<bool> > > SearchEngine::search(const QString &word) const
+QVector<std::pair<QString, int> > SearchEngine::search(const QString &word) const
 {
     QElapsedTimer timer;
     timer.start();
@@ -147,7 +147,8 @@ void SearchEngine::directoryChanged(const QString &)
                 {
                     continue;
                 }
-                m_indexTable.insert(word.toLower()).insert(fileName).push_back(true);
+                std::pair<bool, int &> insertionResult = m_indexTable.insert(word.toLower()).second.insert(fileName);
+                insertionResult.second = insertionResult.first ? 1 : insertionResult.second +1;
             }
         }
         emit filesAdded();

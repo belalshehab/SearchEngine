@@ -69,7 +69,7 @@ void MainWindow::on_searchResultTreeView_activated(const QModelIndex &index)
     file.open(QIODevice::ReadOnly);
     QString fileText = file.readAll();
 
-    QString query = ui->searchInput->text();
+    QString query = ui->searchInput->text().trimmed();
 
     ui->fileText->setText(fileText);
 

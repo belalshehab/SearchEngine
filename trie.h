@@ -60,9 +60,8 @@ public:
 private:
     Node *m_root;
 
-    QVector<std::pair<QString, Node *> > m_vector;
+    QVector<std::pair<QString, Node *> > m_data;
 
-    QVector<std::pair<QString, ValueType> > m_vector2;
     int m_size;
 };
 
@@ -90,8 +89,6 @@ std::pair<bool, ValueType &> Trie<ValueType>::insert(const QString &key)
 {
     Node *node = m_root;
 
-    bool newFlag = false;
-
     for(const QChar &c: key)
     {
         auto itr = std::find_if(node->childrens.begin(), node->childrens.end(), [=](Node *node){
@@ -102,7 +99,6 @@ std::pair<bool, ValueType &> Trie<ValueType>::insert(const QString &key)
         {
             node->childrens.push_back((new Node(c)));
             node = node->childrens.back();
-            newFlag = true;
         }
 
         else
@@ -111,10 +107,12 @@ std::pair<bool, ValueType &> Trie<ValueType>::insert(const QString &key)
         }
     }
 
+    bool newFlag = !node->hasData;
+
     if(newFlag)
     {
         node->hasData = true;
-        m_vector.push_back({key, node});
+        m_data.push_back({key, node});
         ++m_size;
     }
     return {newFlag, node->data};
@@ -159,31 +157,18 @@ std::pair<bool, ValueType &> Trie<ValueType>::search(const QString &key) const
 template<class ValueType>
 QVector<std::pair<QString, ValueType> > Trie<ValueType>::getData() const
 {
-    QVector<std::pair<QString, ValueType> > vec;
-    for(const std::pair<QString, Node*> &elemnt: m_vector)
+    QVector<std::pair<QString, ValueType> > data;
+    for(const std::pair<QString, Node*> &elemnt: m_data)
     {
-        vec.push_back({elemnt.first, elemnt.second->data});
+        data.push_back({elemnt.first, elemnt.second->data});
     }
-    return vec;
+    return data;
 }
 
 template<class ValueType>
 QVector<std::pair<QString, ValueType> > Trie<ValueType>::traverse(QString word, Node *node)
 {
-    if(node == nullptr || node == m_root)
-    {
-        node = m_root;
-        word = "";
-    }
-
-    for(Node *child : node->childrens)
-    {
-        if(child->hasData)
-        {
-            m_vector2.push_back({word, child->data});
-        }
-        return traverse(word + child->key, child);
-    }
+    return {};
 }
 
 template<class ValueType>

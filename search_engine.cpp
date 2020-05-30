@@ -133,7 +133,9 @@ void SearchEngine::directoryChanged(const QString &)
         for(const QString &fileName: added)
         {
             QFile file(m_dir.absoluteFilePath(fileName));
-            file.open(QFile::ReadOnly);
+
+            while(!file.open(QFile::ReadOnly))
+               qInfo() << "couldn't open file";
 
             QTextStream stream(&file);
 
